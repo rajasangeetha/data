@@ -1,0 +1,14 @@
+
+In Power BI:
+
+get data from snowflake 
+
+Server	kgc01752.us-east-1.snowflakecomputing.com
+Warehouse	COMPUTE_WH
+Database	DEMO_DB
+Schema	PUBLIC
+
+
+Got to Report view and add pie chart
+create new measure - Number of customer feedbacks - This would be values
+Legend - customer feeback
