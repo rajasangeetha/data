@@ -1,0 +1,25 @@
+VSANGEETHA#COMPUTE_WH@(no database).(no schema)>USE DATABASE DEMO_DB;
++----------------------------------+
+| status                           |
+|----------------------------------|
+| Statement executed successfully. |
++----------------------------------+
+1 Row(s) produced. Time Elapsed: 0.126s
+
+
+VSANGEETHA#COMPUTE_WH@DEMO_DB.PUBLIC>USE SCHEMA PUBLIC;
++----------------------------------+
+| status                           |
+|----------------------------------|
+| Statement executed successfully. |
++----------------------------------+
+1 Row(s) produced. Time Elapsed: 0.060s
+
+
+VSANGEETHA#COMPUTE_WH@DEMO_DB.PUBLIC>PUT file:///D:/data-projects/snowflake/customer_sales_returns.csv @cust_fb_internal_stage;
++----------------------------+-------------------------------+-------------+-------------+--------------------+--------------------+----------+---------+
+| source                     | target                        | source_size | target_size | source_compression | target_compression | status   | message |
+|----------------------------+-------------------------------+-------------+-------------+--------------------+--------------------+----------+---------|
+| customer_sales_returns.csv | customer_sales_returns.csv.gz |         304 |         256 | NONE               | GZIP               | UPLOADED |         |
++----------------------------+-------------------------------+-------------+-------------+--------------------+--------------------+----------+---------+
+1 Row(s) produced. Time Elapsed: 0.588s

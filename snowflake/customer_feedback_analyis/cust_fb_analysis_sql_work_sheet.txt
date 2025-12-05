@@ -1,0 +1,93 @@
+-- create internal stage
+CREATE OR REPLACE STAGE cust_fb_internal_stage;
+
+LIST @cust_fb_internal_stage;
+
+-- create file format 
+CREATE OR REPLACE FILE FORMAT cust_fb_csv_format
+TYPE = 'CSV'
+FIELD_DELIMITER = ','           
+SKIP_HEADER = 1                
+FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+NULL_IF = ('', 'NULL');        
+
+DESCRIBE FILE FORMAT cust_fb_csv_format;
+
+-- create table for raw data
+CREATE OR REPLACE TABLE raw_sales_returns (
+    sale_id                VARCHAR,
+    customer_id            VARCHAR,
+    customer_name          VARCHAR,
+    product_id              VARCHAR,
+    product_name           VARCHAR,
+    quantity               NUMBER,
+    amount                  NUMBER,
+    sale_date               DATE,
+    return_flag            VARCHAR,
+    return_reason          VARCHAR,
+    courier_id              VARCHAR,
+    courier_name           VARCHAR,
+    customer_feedback      VARCHAR  
+);
+
+
+-- Move data from the file to raw data table
+COPY INTO raw_sales_returns
+FROM @cust_fb_internal_stage/customer_sales_returns.csv
+FILE_FORMAT = (FORMAT_NAME = cust_fb_csv_format);
+
+select * from raw_sales_returns;
+
+-- create dimension table for customer data
+CREATE OR REPLACE TABLE dim_customer AS
+SELECT DISTINCT customer_id, customer_name
+FROM raw_sales_returns;
+
+-- create dimension table for product data
+CREATE OR REPLACE TABLE dim_product AS
+SELECT DISTINCT product_id, product_name
+FROM raw_sales_returns;
+
+-- create dimension table for courier data
+CREATE OR REPLACE TABLE dim_courier AS
+SELECT DISTINCT courier_ID, courier_name
+FROM raw_sales_returns;
+
+-- create dimension table for return reason data
+CREATE TABLE dim_return_reason AS
+SELECT DISTINCT return_Reason
+FROM raw_sales_returns
+WHERE return_Flag = 'Y';
+
+-- create fact table for sales data
+CREATE TABLE fact_sales_returns AS
+SELECT sale_id,
+       customer_id,
+       product_id,
+       quantity,
+       amount,
+       sale_date,
+       return_flag,
+       return_reason,
+       courier_id,
+       customer_feedback
+FROM raw_sales_returns;
+
+-- Analytics *** get the number of deliveries which had issues.
+SELECT c.Courier_Name,
+       COUNT(*) AS bad_deliveries
+FROM fact_sales_returns f
+JOIN dim_courier c ON f.Courier_ID = c.Courier_ID
+WHERE Customer_Feedback IN ('Late Delivery', 'Damaged', 'Wrong Item')
+GROUP BY c.Courier_Name
+ORDER BY bad_deliveries DESC;
+
+-- Analytics *** get the number of returns for each return reasons
+
+SELECT r.Return_Reason,
+       COUNT(*) AS total_returns
+FROM fact_sales_returns f
+JOIN dim_return_reason r ON f.Return_Reason = r.Return_Reason
+WHERE Return_Flag = 'Y'
+GROUP BY r.Return_Reason
+ORDER BY total_returns DESC;

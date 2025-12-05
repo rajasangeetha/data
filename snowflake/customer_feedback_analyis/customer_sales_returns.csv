@@ -1,0 +1,3 @@
+Sale_ID,Customer_ID,Customer_Name,Product_ID,Product_Name,Quantity,Amount,Sale_Date,Return_Flag,Return_Reason,Courier_ID,Courier_Name,Customer_Feedback
+1001,C001,Alice,P001,Laptop,1,1200,2025-12-01,Y,Damaged,CR01,DHL,Late Delivery
+1002,C002,Bob,P002,Mouse,2,50,2025-12-01,N,NULL,CR02,FedEx,Good Service
